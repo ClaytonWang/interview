@@ -1,0 +1,13 @@
+.person {
+    width: 100%;
+    height: 40px;
+    margin: 5px 0;
+    line-height: 40px;
+    text-align: center;
+    border: 1px solid #000;
+}
+
+.person:hover{
+    background-color: beige;
+    cursor: pointer;
+}
