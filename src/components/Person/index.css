@@ -1,13 +1,28 @@
 .person {
-    width: 100%;
-    height: 40px;
-    margin: 5px 0;
-    line-height: 40px;
-    text-align: center;
-    border: 1px solid #000;
+  width: 100%;
+  height: 40px;
+  margin: 3px 0;
+  position: relative;
+  line-height: 40px;
+  text-align: center;
+  border: 1px solid #000;
 }
 
-.person:hover{
-    background-color: beige;
-    cursor: pointer;
+.person:hover {
+  background-color: azure;
+  cursor: pointer;
+}
+
+.del-icon {
+  display: none;
+  width: 16px;
+  height: 16px;
+  position: absolute;
+  right: -5px;
+  top: -5px;
+  background-image: url(../../assets/delete-filling.png);
+}
+
+.person:hover .del-icon {
+  display: inline-block;
 }

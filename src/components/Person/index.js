@@ -10,8 +10,17 @@ class Person extends React.Component {
   constructor(props) {
     super(props);
   }
+
   render() {
-    return <div className="person">{this.props.name}</div>;
+    return (
+      <div className="person">
+        <span>{this.props.node?.name}</span>
+        <i
+          className="del-icon"
+          onClick={() => this.props.onClick(this.props.node?.id)}
+        ></i>
+      </div>
+    );
   }
 }
 

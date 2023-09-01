@@ -6,7 +6,6 @@
 import GenealogyNode from './genealogyNode';
 
 export function getGenealogyData() {
-
   const rootNode = new GenealogyNode('爷爷');
   const babaNode = new GenealogyNode('爸爸');
   const ershuNode = new GenealogyNode('二叔');

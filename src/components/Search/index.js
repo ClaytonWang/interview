@@ -6,15 +6,19 @@
 import { useState } from 'react';
 import './index.css';
 
-const Search = () => { 
-    const [value, setValue] = useState('');
+const Search = ({ onSearch }) => {
+  const [value, setValue] = useState('');
 
-    return (
-        <div className='search'>
-            <input />
-            <button>查询</button>
-        </div>
-    )
-}
+  return (
+    <div className="search">
+      <input
+        onChange={(e) => {
+          setValue(e.target.value);
+        }}
+      />
+      <button onClick={() => onSearch(value)}>查询</button>
+    </div>
+  );
+};
 
 export default Search;

@@ -1,68 +1,38 @@
 /**
  * 家谱组件,按照数据渲染出树
  */
-
+import { useContext } from 'react';
 import Person from '../Person';
-import { getGenealogyData } from '../../utils/data';
-const genealogyData = getGenealogyData();
-console.log(genealogyData)
-const Genealogy = () => {
-  const toReactComponent1 = (node) => {
-    const TreeNodeComponent = ({ name, children }) => (
-      <div>
-        <Person name={name} />
-        {children?.map((child) => child)}
-      </div>
-    );
+import './index.css';
 
-    const childrenComponents = node.children?.map((childNode) =>
-      toReactComponent(childNode)
-    );
+import { EventContext } from '../../app';
 
+const Genealogy = ({ source }) => {
+  const delNode = useContext(EventContext);
+
+  if (!source) {
+    return <div>搜索的数据不存在或已被删除,请刷新页面重新加载数据!</div>;
+  }
+
+  // 树节点的组件
+  const TreeNodeComponent = ({ node, children }) => {
     return (
-      <TreeNodeComponent
-        name={node.name}
-        key={node.id}
-        children={childrenComponents}
-      />
-    );
-  };
-
-  const toReactComponent = (node) => {
-    const TreeNodeComponent = ({ name, children }) => (
-      <div>
-        <Person name={name} />
-        {children?.map((child) => child)}
+      <div className="container">
+        <Person node={node} key={node.id} onClick={delNode} />
+        {children?.length > 0 ? <div className="wraper">{children}</div> : null}
       </div>
     );
-
-    const queue = [node];
-    const components = [];
-
-    while (queue.length > 0) {
-
-      const currentNode = queue.shift();
-
-      const childrenComponents = currentNode.children.map((childNode) => {
-        toReactComponent1(childNode);
-
-    });
-
-      const currentComponent = (
-        <TreeNodeComponent key={currentNode.id} name={currentNode.name} >
-          {childrenComponents}
-        </TreeNodeComponent>
-      );
-
-      components.push(currentComponent);
-      queue.push(...currentNode.children);
-    }
-
-    console.log(components)
-    return components;
   };
 
-  return toReactComponent1(genealogyData);
+  // 将树按照深度优先遍历转换为组件层级结构
+  const treeToReactComponents = (node) => {
+    return (
+      <TreeNodeComponent key={node.id} node={node}>
+        {node.children.map((childNode) => treeToReactComponents(childNode))}
+      </TreeNodeComponent>
+    );
+  };
+  return treeToReactComponents(source);
 };
 
 export default Genealogy;
