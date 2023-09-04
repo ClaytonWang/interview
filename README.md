@@ -19,6 +19,10 @@
 
 ### 考题需求文档
 [考题需求文档](/docs/测试题目.pdf)
+
 ### 1:1完成后的效果 
 ![avatar](/docs/1.jpg)
 ![avatar](/docs/2.jpg)
+![avatar](/docs/3.jpg)
+![avatar](/docs/4.jpg)
+![avatar](/docs/5.jpg)
