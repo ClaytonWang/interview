@@ -1,7 +1,7 @@
 .person {
   width: 100%;
   height: 40px;
-  margin: 3px 0;
+  /* margin: 3px 0; */
   position: relative;
   line-height: 40px;
   text-align: center;
