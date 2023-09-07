@@ -3,10 +3,10 @@
  * @author junshi wang
  */
 
-import { useState } from 'react';
+import { useState,memo } from 'react';
 import './index.css';
 
-const Search = ({ onSearch }) => {
+const Search = memo(({ onSearch }) => {
   const [value, setValue] = useState('');
 
   return (
@@ -19,6 +19,6 @@ const Search = ({ onSearch }) => {
       <button onClick={() => onSearch(value)}>查询</button>
     </div>
   );
-};
+});
 
 export default Search;
