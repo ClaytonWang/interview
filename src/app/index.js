@@ -38,14 +38,16 @@ function App() {
 
   const matrixData = useMemo(() => {
     const data = treeToMatrix(source);
-    console.log(data);
+    // console.log(`data`, data);
     return data;
-  },[source])
+  }, [source]);
 
   return (
     <EventContext.Provider value={delNode}>
       <div className="app">
-        <header><h1>测试题目</h1></header>
+        <header>
+          <h1>测试题目</h1>
+        </header>
         <Search onSearch={search} />
         <Genealogy source={matrixData} />
       </div>

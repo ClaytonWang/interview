@@ -10,40 +10,22 @@ import { EventContext } from '../../app';
 const Genealogy = ({ source }) => {
   const delNode = useContext(EventContext);
 
-  if (!source) {
+  if (!source || source.length === 0) {
     return <div>搜索的数据不存在或已被删除,请刷新页面重新加载数据!</div>;
   }
 
-  return <div className="container">
-    {source.map((item,index) => {
-      if (Array.isArray(item)) {
-        return item.map((node) => {
-          return <Person node={node} key={node.id} onClick={delNode} />
-        })
-      }
-      return <Person node={item} key={item.id} onClick={delNode} />
+  return <table><tbody>
+    {source.map((item, index) => {
+      return <tr key={index}>
+        {
+          item.map((node) => {
+            return <td rowSpan={node.rowspan} colSpan={node.colspan} key={node.id}><Person node={node} onClick={delNode} /></td>
+          })
+        }
+      </tr>
     })}
-  </div>
+  </tbody></table>
 
-  // // 树节点的组件
-  // const TreeNodeComponent = ({ node, children }) => {
-  //   return (
-  //     <div className="container">
-  //       <Person node={node} key={node.id} onClick={delNode} />
-  //       {children?.length > 0 ? <div className="wraper">{children}</div> : null}
-  //     </div>
-  //   );
-  // };
-
-  // // 将树按照深度优先遍历转换为组件层级结构
-  // const treeToReactComponents = (node) => {
-  //   return (
-  //     <TreeNodeComponent key={node.id} node={node}>
-  //       {node.children.map((childNode) => treeToReactComponents(childNode))}
-  //     </TreeNodeComponent>
-  //   );
-  // };
-  // return treeToReactComponents(source);
 };
 
 export default Genealogy;

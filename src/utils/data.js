@@ -33,7 +33,7 @@ export function getGenealogyData() {
   myNode.addChild(doNode);
 
   tmNode.addChild(zhiziNode);
-  tmNode.addChild(zhinvNode);
+  // tmNode.addChild(zhinvNode);
 
   return rootNode;
 }
