@@ -1,3 +1,7 @@
+import _ from 'lodash';
+import { commitMatrixData } from '../utils/treeSlice';
+import { store } from '../store';
+
 export function randomID(min = 100, max = 1000) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
@@ -83,6 +87,8 @@ function calcCurrentDepth(root, node, currentDepth) {
 function calcRowspan(root, node) {
   let depth = 1;
 
+  if (root.id === node.id) return depth;
+
   if (node.children.length === 0) {
     const treeDepth = calcMaxDepth(root);
     const currentDepth = calcCurrentDepth(root, node, 0);
@@ -127,23 +133,22 @@ function calcCurrentBreadth(node) {
  * @param {*} node 当前节点
  */
 function reCaclColspan(width, node) {
-
   const queue = [{ width, node }];
 
   while (queue.length > 0) {
     const item = queue.shift();
 
     item.node.colspan = item.width;
+    // console.log(item.node, item.width)
 
     let subWidth = item.width;
     if (item.node.children.length > 1) {
-      subWidth = subWidth / (item.node.children.length === 0 ? 1 : item.node.children.length);
+      subWidth = subWidth / item.node.children.length;
     }
-    console.log(item.node, subWidth)
+
     for (let n of item.node.children) {
       queue.push({ width: subWidth, node: n });
     }
-
   }
 
   return node;
@@ -158,10 +163,13 @@ function reCaclColspan(width, node) {
  * @returns Array[]
  */
 export const calcTreeSpan = (root) => {
-
   //递归的计算
+  /**
+   * 1,算出rowspan
+   * 2,算出每个节点的最大
+   * @param {*} node
+   */
   const calcRowAndBreadth = (node) => {
-
     // //计算出当前节点的colspan 和 rowspan
     // let maxColspan = 0;
     // //取兄弟节点colspan的最大值
@@ -174,7 +182,7 @@ export const calcTreeSpan = (root) => {
     // if (maxColspan === 0) maxColspan = 1;
 
     // node.colspan = maxColspan;
-    node.breadth = calcCurrentBreadth(node);;
+    node.breadth = calcCurrentBreadth(node);
 
     node.rowspan = calcRowspan(root, node);
 
@@ -185,13 +193,22 @@ export const calcTreeSpan = (root) => {
 
   calcRowAndBreadth(root);
 
+  // console.log(root)
 
+  /**
+   * 3,在兄弟节点中取宽度最大的值,用此最大值把小于此宽度的兄弟节点的孩子重新计算一下.
+   * @param {*} node
+   */
   const calcColspan = (node) => {
     const queue = [{ maxBreadth: 0, node }];
     while (queue.length > 0) {
       const item = queue.shift();
 
-      reCaclColspan(item.maxBreadth, item.node);
+      if (item.node.breadth < item.maxBreadth) {
+        // console.log(`currentNode`, item.node, item.maxBreadth);
+        reCaclColspan(item.maxBreadth, item.node);
+      }
+
       // console.log(`currentNode`, item.node,item.maxBreadth);
 
       // 取到当前兄弟 中最大的宽度
@@ -206,16 +223,15 @@ export const calcTreeSpan = (root) => {
       for (let n of item.node.children) {
         queue.push({ maxBreadth, node: n });
       }
-
     }
-  }
+  };
 
   calcColspan(root);
 
-  console.log(root)
+  // console.log(root)
 
   return root;
-}
+};
 
 /**
  * 把计算好的树转换成二维数组,用来在页面上渲染组件.
@@ -245,7 +261,12 @@ export const treeToMatrix = (root) => {
       //兄弟同层级中colspan取最大值
       // maxColspan = Math.max(maxColspan, currentNode.breadth);
 
-      currentLevelNodes.push({ id: currentNode.id, name: currentNode.name, colspan: currentNode.colspan, rowspan: currentNode.rowspan })
+      currentLevelNodes.push({
+        id: currentNode.id,
+        name: currentNode.name,
+        colspan: currentNode.colspan,
+        rowspan: currentNode.rowspan,
+      });
 
       if (currentNode.children) {
         queue.push(...currentNode.children);
@@ -254,6 +275,153 @@ export const treeToMatrix = (root) => {
     result.push(currentLevelNodes);
   }
 
-  console.log(result);
+  // console.log(result);
+  return result;
+};
+
+
+let wipRoot = null;
+let nextUnitOfWork = null;
+
+export function calcTreeColRowSpan(root) {
+  if (!root) return root;
+
+  // wipRoot = nextUnitOfWork = _.cloneDeep(root);
+  wipRoot = nextUnitOfWork = root;
+
+  //大数据下,浏览器空闲时候执行
+  requestIdleCallback(workLoop);
+  // return workLoop()
+}
+
+function workLoop(deadline) {
+  let shouldYield = false;
+  while (nextUnitOfWork && !shouldYield) {
+    nextUnitOfWork = performUnitOfWork(nextUnitOfWork);
+    shouldYield = deadline.timeRemaining() < 1;
+  }
+
+  if (!nextUnitOfWork && wipRoot) {
+    // return commitRoot()
+    commitRoot()
+  }
+  // return null;
+  requestIdleCallback(workLoop);
+}
+
+function performUnitOfWork(fiber) {
+  const elements = fiber.children
+  let index = 0
+  let prevSibling = null
+  let maxCol = 1;
+
+  //父亲只有一个孩子,那么这个孩子的宽度与父亲相等
+  if (elements.length > 1) {
+    let first = calcCurrentBreadth(elements[0]);
+    maxCol = elements.reduce((max, currentNode) => {
+      let current = calcCurrentBreadth(currentNode);
+      if (current > max) {
+        return current;
+      } else {
+        return max;
+      }
+    }, first);
+  } else {
+    maxCol = fiber.colspan;
+  }
+
+  //最小宽度为1
+  if (maxCol === 0) maxCol = 1;
+
+  //如果孩子的宽度没有父亲大,那么平分父亲的宽度
+  if (maxCol < fiber.colspan) {
+    maxCol = fiber.colspan / elements.length;
+  }
+
+  while (index < elements.length) {
+    const element = elements[index]
+
+    const newFiber = {
+      id: element.id,
+      name: element.name,
+      children: element.children,
+      colspan: maxCol,
+      parent: fiber,
+      rowspan: calcRowspan(wipRoot, element)
+    }
+
+    if (index === 0) {
+      fiber.child = newFiber
+    } else {
+      prevSibling.sibling = newFiber
+    }
+
+    prevSibling = newFiber
+    index++
+
+  }
+
+  //父亲宽度是孩子最大宽度的和
+  let total = maxCol * index;;
+  if (total > fiber.colspan || !fiber.colspan) {
+    fiber.colspan = total;
+  }
+
+  console.log(fiber, '----', maxCol, '---', index, '---', fiber.colspan)
+
+  if (fiber.child) {
+    return fiber.child
+  }
+
+  let nextFiber = fiber
+
+  while (nextFiber) {
+    if (nextFiber.sibling) {
+      return nextFiber.sibling
+    }
+    nextFiber = nextFiber.parent
+  }
+
+}
+
+function commitRoot() {
+  const data = commitWork(wipRoot)
+  store.dispatch(commitMatrixData(data));
+  // console.log(wipRoot)
+  wipRoot = null
+  // return data;
+}
+
+function commitWork(fiber) {
+  if (!fiber) {
+    return;
+  }
+
+  const result = [];
+  const queue = [fiber];
+
+  while (queue.length > 0) {
+    const currentLevelSize = queue.length;
+    const currentLevelNodes = [];
+
+    for (let i = 0; i < currentLevelSize; i++) {
+      const currentFiber = queue.shift();
+      currentLevelNodes.push({ id: currentFiber.id, name: currentFiber.name, colspan: currentFiber.colspan, rowspan: currentFiber.rowspan });
+
+      // 将子节点按层级顺序添加到队列中
+      if (currentFiber.child) {
+        let child = currentFiber.child;
+        while (child) {
+          queue.push(child);
+          child = child.sibling;
+        }
+      }
+    }
+
+    result.push(currentLevelNodes);
+  }
+
+  // console.log(result)
   return result;
 }
+

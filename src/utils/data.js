@@ -5,40 +5,36 @@
 
 import GenealogyNode from './genealogyNode';
 
-export function getGenealogyData() {
-  const rootNode = new GenealogyNode('爷爷');
-  const babaNode = new GenealogyNode('爸爸');
-  const ershuNode = new GenealogyNode('二叔');
-  const sanguNode = new GenealogyNode('三姑');
-  const myNode = new GenealogyNode('我');
-  const sisterNode = new GenealogyNode('妹妹');
-  const tgNode = new GenealogyNode('堂哥');
-  const tmNode = new GenealogyNode('堂妹');
-  const sonNode = new GenealogyNode('儿子');
-  const doNode = new GenealogyNode('女儿');
-  const zhiziNode = new GenealogyNode('侄子');
-  const zhinvNode = new GenealogyNode('侄女');
 
-  rootNode.addChild(babaNode);
-  rootNode.addChild(ershuNode);
-  rootNode.addChild(sanguNode);
+const rootNode = new GenealogyNode('爷爷');
+const babaNode = new GenealogyNode('爸爸');
+const ershuNode = new GenealogyNode('二叔');
+const sanguNode = new GenealogyNode('三姑');
+const myNode = new GenealogyNode('我');
+const sisterNode = new GenealogyNode('妹妹');
+const tgNode = new GenealogyNode('堂哥');
+const tmNode = new GenealogyNode('堂妹');
+const sonNode = new GenealogyNode('儿子');
+const doNode = new GenealogyNode('女儿');
+const zhiziNode = new GenealogyNode('侄子');
+const zhinvNode = new GenealogyNode('侄女');
 
-  babaNode.addChild(myNode);
-  babaNode.addChild(sisterNode);
+rootNode.addChild(babaNode);
+rootNode.addChild(ershuNode);
+rootNode.addChild(sanguNode);
 
-  ershuNode.addChild(tgNode);
-  ershuNode.addChild(tmNode);
+babaNode.addChild(myNode);
+babaNode.addChild(sisterNode);
 
-  myNode.addChild(sonNode);
-  myNode.addChild(doNode);
+ershuNode.addChild(tgNode);
+ershuNode.addChild(tmNode);
 
-  tmNode.addChild(zhiziNode);
-  // tmNode.addChild(zhinvNode);
+myNode.addChild(sonNode);
+myNode.addChild(doNode);
 
-  return rootNode;
-}
+tmNode.addChild(zhiziNode);
+tmNode.addChild(zhinvNode);
 
-// 删除节点值为 3 的节点及其子节点
-// rootNode.breadthFirstDelete(3);
+window.data = rootNode;
 
-// console.log(rootNode); // 输出树结构，已删除节点 3 及其子节点
+export const data = rootNode;

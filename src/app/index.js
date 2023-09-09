@@ -1,46 +1,59 @@
 import './index.css';
 import Search from '../components/Search';
 import Genealogy from '../components/Genealogy';
-import { getGenealogyData } from '../utils/data';
-import { useState, createContext, useCallback, useMemo } from 'react';
-import { findNode, breadthFirstDelete, treeToMatrix } from '../utils/utils';
-
-const genealogyData = getGenealogyData();
+import { useState, createContext, useCallback, useMemo,useEffect, useLayoutEffect } from 'react';
+import { findNode, breadthFirstDelete} from '../utils/utils';
+import { useSelector, useDispatch } from 'react-redux';
+import {
+  calcTree,
+  commitSourceData,
+  selectSourceData,
+  selectMatrixData
+} from '../utils/treeSlice';
 
 export const EventContext = createContext();
 
 function App() {
-  const [source, setSource] = useState(genealogyData);
+  const source = useSelector(selectSourceData);
+  const matrix = useSelector(selectMatrixData);
+  const dispatch = useDispatch();
+
+  useLayoutEffect(() => {
+    dispatch(calcTree());
+  }, [dispatch]);
 
   const search = useCallback(
     (name) => {
       const newdata = findNode(source, name);
+
       if (!newdata) {
-        setSource(null);
+        dispatch(commitSourceData(null));
       } else {
-        setSource({ ...newdata });
+        dispatch(commitSourceData({ ...newdata }));
       }
     },
-    [source]
+    [source,dispatch]
   );
 
   const delNode = useCallback(
     (id) => {
       const newdata = breadthFirstDelete(source, id);
+
       if (!newdata) {
-        setSource(null);
+        dispatch(commitSourceData(null));
       } else {
-        setSource({ ...newdata });
+        dispatch(commitSourceData({ ...newdata }));
       }
     },
-    [source]
+    [source,dispatch]
   );
 
-  const matrixData = useMemo(() => {
-    const data = treeToMatrix(source);
-    // console.log(`data`, data);
-    return data;
-  }, [source]);
+  // const matrixData = useMemo(() => {
+  //   console.log(source)
+  //   if (!source) return [];
+  //   return calcTreeColRowSpan(source);
+  //   // const data = calcTreeColRowSpan(source);
+  // }, [source]);
 
   return (
     <EventContext.Provider value={delNode}>
@@ -49,7 +62,7 @@ function App() {
           <h1>测试题目</h1>
         </header>
         <Search onSearch={search} />
-        <Genealogy source={matrixData} />
+        <Genealogy source={matrix} />
       </div>
     </EventContext.Provider>
   );
