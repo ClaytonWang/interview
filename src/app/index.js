@@ -2,58 +2,44 @@ import './index.css';
 import Search from '../components/Search';
 import Genealogy from '../components/Genealogy';
 import { useState, createContext, useCallback, useMemo,useEffect, useLayoutEffect } from 'react';
-import { findNode, breadthFirstDelete} from '../utils/utils';
-import { useSelector, useDispatch } from 'react-redux';
-import {
-  calcTree,
-  commitSourceData,
-  selectSourceData,
-  selectMatrixData
-} from '../utils/treeSlice';
+import { findNode, breadthFirstDelete,calcTreeColRowSpan} from '../utils/utils';
+import { data } from '../utils/data';
 
 export const EventContext = createContext();
 
 function App() {
-  const source = useSelector(selectSourceData);
-  const matrix = useSelector(selectMatrixData);
-  const dispatch = useDispatch();
-
-  useLayoutEffect(() => {
-    dispatch(calcTree());
-  }, [dispatch]);
+  const [source, setSource] = useState(data);
 
   const search = useCallback(
     (name) => {
       const newdata = findNode(source, name);
-
       if (!newdata) {
-        dispatch(commitSourceData(null));
+        setSource(null);
       } else {
-        dispatch(commitSourceData({ ...newdata }));
+        setSource({ ...newdata });
       }
     },
-    [source,dispatch]
+    [source]
   );
 
   const delNode = useCallback(
     (id) => {
       const newdata = breadthFirstDelete(source, id);
-
       if (!newdata) {
-        dispatch(commitSourceData(null));
+        setSource(null);
       } else {
-        dispatch(commitSourceData({ ...newdata }));
+        setSource({ ...newdata });
       }
     },
-    [source,dispatch]
+    [source]
   );
 
-  // const matrixData = useMemo(() => {
-  //   console.log(source)
-  //   if (!source) return [];
-  //   return calcTreeColRowSpan(source);
-  //   // const data = calcTreeColRowSpan(source);
-  // }, [source]);
+  const matrixData = useMemo(() => {
+    console.log(source)
+    if (!source) return [];
+    return calcTreeColRowSpan(source);
+
+  }, [source]);
 
   return (
     <EventContext.Provider value={delNode}>
@@ -62,7 +48,7 @@ function App() {
           <h1>测试题目</h1>
         </header>
         <Search onSearch={search} />
-        <Genealogy source={matrix} />
+        <Genealogy source={matrixData} />
       </div>
     </EventContext.Provider>
   );

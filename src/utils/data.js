@@ -5,7 +5,6 @@
 
 import GenealogyNode from './genealogyNode';
 
-
 const rootNode = new GenealogyNode('爷爷');
 const babaNode = new GenealogyNode('爸爸');
 const ershuNode = new GenealogyNode('二叔');
@@ -34,7 +33,5 @@ myNode.addChild(doNode);
 
 tmNode.addChild(zhiziNode);
 tmNode.addChild(zhinvNode);
-
-window.data = rootNode;
 
 export const data = rootNode;
