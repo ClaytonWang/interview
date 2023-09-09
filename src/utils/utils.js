@@ -99,13 +99,13 @@ function calcRowspan(root, node) {
 
 function calcCurrentBreadth(node) {
   if (!node) {
-    return 1;
+    return 0;
   }
 
-  let count = node.children.length;
+  let count = node.children.length
 
   for (const child of node.children) {
-    count = count + calcCurrentBreadth(child);
+    count += calcCurrentBreadth(child);
   }
 
   return count;
@@ -166,7 +166,15 @@ function performUnitOfWork(fiber) {
       }
     }, first);
   } else {
-    maxCol = fiber.colspan;
+    if (!fiber.colspan) {
+      let sub = elements[0];
+      while (sub  && sub.length  ===  1) {
+        sub = sub.children[0];
+      }
+      maxCol = calcCurrentBreadth(sub);
+    } else {
+      maxCol = fiber.colspan;
+    }
   }
 
   //最小宽度为1
@@ -206,7 +214,7 @@ function performUnitOfWork(fiber) {
     fiber.colspan = total;
   }
 
-  // console.log(fiber, '----', maxCol, '---', index, '---', fiber.colspan)
+  console.log(fiber, '----', maxCol, '---', index, '---', fiber.colspan)
 
   if (fiber.child) {
     return fiber.child
