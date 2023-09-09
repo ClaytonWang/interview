@@ -1,7 +1,7 @@
 import './index.css';
 import Search from '../components/Search';
 import Genealogy from '../components/Genealogy';
-import { useState, createContext, useCallback, useMemo,useEffect, useLayoutEffect } from 'react';
+import { createContext, useCallback, useLayoutEffect } from 'react';
 import { findNode, breadthFirstDelete} from '../utils/utils';
 import { useSelector, useDispatch } from 'react-redux';
 import {
@@ -19,8 +19,8 @@ function App() {
   const dispatch = useDispatch();
 
   useLayoutEffect(() => {
-    dispatch(calcTree());
-  }, [dispatch]);
+    dispatch(calcTree(source));
+  }, [source,dispatch]);
 
   const search = useCallback(
     (name) => {

@@ -2,6 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 
 import { calcTreeColRowSpan } from './utils';
 import { data } from './data';
+import _ from 'lodash';
 
 const initialState = {
   source: data,
@@ -28,10 +29,8 @@ export const selectSourceData = (state) => state.calcTree.source;
 
 export const { commitMatrixData,commitSourceData } = treeSlice.actions;
 
-export const calcTree = () => (dispatch, getState) => {
-  const currentValue = selectSourceData(getState());
-  console.log(currentValue)
-  calcTreeColRowSpan(currentValue)
+export const calcTree = (data) => (dispatch, getState) => {
+  calcTreeColRowSpan(_.cloneDeep(data))
 };
 
 export default treeSlice.reducer;
