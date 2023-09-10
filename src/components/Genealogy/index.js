@@ -4,28 +4,26 @@
 import { useContext } from 'react';
 import Person from '../Person';
 import './index.css';
+import { memo } from 'react';
 
 import { EventContext } from '../../app';
 
-const Genealogy = ({ source }) => {
+const Genealogy = memo(({ source }) => {
   const delNode = useContext(EventContext);
 
+  console.log(source)
   if (!source || source.length === 0) {
     return <div>搜索的数据不存在或已被删除,请刷新页面重新加载数据!</div>;
   }
 
-  return <table><tbody>
-    {source.map((item, index) => {
-      return <tr key={index}>
-        {
-          item.map((node) => {
-            return <td rowSpan={node.rowspan} colSpan={node.colspan} key={node.id}><Person node={node} onClick={delNode} /></td>
-          })
-        }
-      </tr>
-    })}
-  </tbody></table>
+  return <div className='container'>
+    {
+      source.map((node) => {
+        return <Person node={node} onClick={delNode} key={node.id} />
+      })
+    }
+  </div>
 
-};
+});
 
 export default Genealogy;

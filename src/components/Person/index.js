@@ -10,7 +10,7 @@ import { memo } from 'react';
 const Person = memo(({ node, onClick }) => {
 
   return (
-    <div className="person">
+    <div className="person" style={{ width: node.width, height: node.height, left: node.left, top: node.top }}>
       <span>{node?.name}</span>
       <i
         className="del-icon"

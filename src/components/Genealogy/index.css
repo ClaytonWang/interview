@@ -5,3 +5,7 @@ table {
 table td {
   vertical-align: top;
 }
+
+.container{
+  position: relative;
+}

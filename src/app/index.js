@@ -1,7 +1,7 @@
 import './index.css';
 import Search from '../components/Search';
 import Genealogy from '../components/Genealogy';
-import { useState, createContext, useCallback, useMemo,useEffect, useLayoutEffect } from 'react';
+import { useState, createContext, useCallback, useMemo} from 'react';
 import { findNode, breadthFirstDelete,calcTreeColRowSpan} from '../utils/utils';
 import { data } from '../utils/data';
 
@@ -35,11 +35,11 @@ function App() {
   );
 
   const matrixData = useMemo(() => {
-    console.log(source)
     if (!source) return [];
     return calcTreeColRowSpan(source);
 
   }, [source]);
+
 
   return (
     <EventContext.Provider value={delNode}>

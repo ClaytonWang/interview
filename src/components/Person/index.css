@@ -1,5 +1,5 @@
 .person {
-  position: relative;
+  position: absolute;
   line-height: 40px;
   text-align: center;
   border: 1px solid #000;
