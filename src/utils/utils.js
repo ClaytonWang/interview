@@ -182,7 +182,7 @@ function performUnitOfWork(fiber) {
 
   //如果孩子的宽度没有父亲大,那么平分父亲的宽度
   if (maxCol < fiber.colspan) {
-    maxCol = Math.ceil(fiber.colspan / elements.length);
+    maxCol = fiber.colspan / elements.length;
   }
 
   while (index < elements.length) {
